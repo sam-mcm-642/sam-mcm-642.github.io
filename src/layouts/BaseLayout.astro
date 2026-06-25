@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { site } from '../data/site';
+import { site, socials } from '../data/site';
 
 interface Props {
   title?: string;
@@ -16,6 +16,16 @@ const pageTitle = title ? `${title} · ${site.name}` : site.name;
 const metaDescription = description ?? site.tagline;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageUrl = new URL(ogImage ?? '/og-default.png', Astro.site).href;
+
+// JSON-LD Person — structured data for search engines (portfolio SEO signal).
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: site.url,
+  jobTitle: 'Machine Learning & Data Scientist',
+  sameAs: socials.filter((s) => s.href.startsWith('http')).map((s) => s.href),
+};
 ---
 
 <!doctype html>
@@ -42,6 +52,8 @@ const ogImageUrl = new URL(ogImage ?? '/og-default.png', Astro.site).href;
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogImageUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} is:inline />
 
     <!-- Set theme before paint to avoid a flash of the wrong mode. -->
     <script is:inline>
