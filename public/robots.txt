@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sam-mcm-642.github.io/sitemap-index.xml

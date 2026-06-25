@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<a
+  href={`/projects/${project.id}`}
+  class="reveal group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg"
+>
+  {
+    data.heroImage && (
+      <div class="aspect-[16/9] overflow-hidden border-b border-border">
+        <Image
+          src={data.heroImage}
+          alt={`${data.title} preview`}
+          width={720}
+          height={405}
+          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        />
+      </div>
+    )
+  }
+  <div class="flex flex-1 flex-col gap-3 p-5">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="font-display text-lg font-semibold tracking-tight">{data.title}</h3>
+      <span class="shrink-0 text-xs text-accent opacity-0 transition-opacity group-hover:opacity-100">
+        View →
+      </span>
+    </div>
+    <p class="text-sm leading-relaxed text-muted">{data.summary}</p>
+    <ul class="mt-auto flex flex-wrap gap-1.5 pt-2">
+      {
+        data.stack.slice(0, 5).map((tech) => (
+          <li class="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted">{tech}</li>
+        ))
+      }
+    </ul>
+  </div>
+</a>

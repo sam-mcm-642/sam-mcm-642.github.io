@@ -1,0 +1,23 @@
+---
+import { site, socials } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border">
+  <div class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-muted sm:flex-row">
+    <p>© {year} {site.name}</p>
+    <div class="flex items-center gap-5">
+      {
+        socials.map((s) => (
+          <a
+            href={s.href}
+            class="transition-colors hover:text-text"
+            {...s.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+          >
+            {s.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</footer>

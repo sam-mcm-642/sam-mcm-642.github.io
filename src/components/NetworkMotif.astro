@@ -1,0 +1,36 @@
+---
+/*
+  Decorative network backdrop for the hero — subtle nodes + edges that thread
+  the signature motif behind the intro. Purely decorative (aria-hidden), low
+  opacity, no animation by default so it never competes with the copy.
+*/
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 600 400"
+  fill="none"
+  aria-hidden="true"
+  preserveAspectRatio="xMidYMid slice"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g stroke="currentColor" stroke-width="1" opacity="0.5">
+    <path d="M70 90 210 60M210 60 320 150M320 150 470 110M470 110 540 210M210 60 180 200M180 200 320 150M180 200 90 300M320 150 360 290M360 290 470 110M360 290 510 330M90 300 230 340M230 340 360 290" />
+  </g>
+  <g fill="currentColor">
+    <circle cx="70" cy="90" r="3" opacity="0.7" />
+    <circle cx="210" cy="60" r="4" opacity="0.9" />
+    <circle cx="320" cy="150" r="5" />
+    <circle cx="470" cy="110" r="4" opacity="0.9" />
+    <circle cx="540" cy="210" r="3" opacity="0.6" />
+    <circle cx="180" cy="200" r="4" opacity="0.8" />
+    <circle cx="90" cy="300" r="3" opacity="0.6" />
+    <circle cx="360" cy="290" r="5" opacity="0.85" />
+    <circle cx="510" cy="330" r="3" opacity="0.6" />
+    <circle cx="230" cy="340" r="4" opacity="0.7" />
+  </g>
+</svg>
