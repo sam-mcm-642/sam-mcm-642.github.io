@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { site, socials } from '../data/site';
+import { site, socials, analytics } from '../data/site';
 
 interface Props {
   title?: string;
@@ -54,6 +54,13 @@ const personSchema = {
     <meta name="twitter:image" content={ogImageUrl} />
 
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} is:inline />
+
+    {/* Privacy-friendly analytics — only loads when a domain is configured (see src/data/site.ts). */}
+    {
+      analytics.plausibleDomain && (
+        <script defer data-domain={analytics.plausibleDomain} src={analytics.plausibleSrc} is:inline />
+      )
+    }
 
     <!-- Set theme before paint to avoid a flash of the wrong mode. -->
     <script is:inline>

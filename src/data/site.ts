@@ -13,6 +13,18 @@ export interface SocialLink {
   href: string;
 }
 
+/*
+  Privacy-friendly, cookieless analytics (no consent banner needed).
+  Off by default. To enable: create a site at https://plausible.io (or self-host
+  / use a compatible script), then set `plausibleDomain` to your site domain.
+  Leave it empty and no analytics script is loaded at all.
+*/
+export const analytics = {
+  plausibleDomain: '', // e.g. 'sam-mcm-642.github.io'
+  // Override only if self-hosting Plausible or using a compatible endpoint.
+  plausibleSrc: 'https://plausible.io/js/script.js',
+};
+
 export const site = {
   name: 'Sam McManagan',
   /* The hero one-liner: ML/DS core, psychology differentiator, SWE range. */

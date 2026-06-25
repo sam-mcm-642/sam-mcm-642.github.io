@@ -67,6 +67,14 @@ Edit the design tokens in `src/styles/global.css` (the `@theme` block + the
 `.dark` overrides): fonts and palette are CSS variables, so changing them
 re-skins the whole site. Nothing references raw hex values directly.
 
+### Enable analytics (optional)
+
+Privacy-friendly, cookieless analytics is wired up but **off by default** — no
+script loads until you opt in. To enable: create a site at
+[plausible.io](https://plausible.io) (or self-host a compatible script), then set
+`analytics.plausibleDomain` in `src/data/site.ts` to your site domain. No cookie
+banner is needed.
+
 ## Deployment
 
 Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds the site
