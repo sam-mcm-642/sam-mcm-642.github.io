@@ -15,7 +15,7 @@ const { title, description, ogImage } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : site.name;
 const metaDescription = description ?? site.tagline;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImageUrl = new URL(ogImage ?? '/og-default.svg', Astro.site).href;
+const ogImageUrl = new URL(ogImage ?? '/og-default.png', Astro.site).href;
 ---
 
 <!doctype html>
@@ -55,8 +55,14 @@ const ogImageUrl = new URL(ogImage ?? '/og-default.svg', Astro.site).href;
     </script>
   </head>
   <body class="min-h-screen flex flex-col bg-bg text-text">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-fg"
+    >
+      Skip to content
+    </a>
     <Nav />
-    <main class="flex-1">
+    <main id="main" class="flex-1">
       <slot />
     </main>
     <Footer />
