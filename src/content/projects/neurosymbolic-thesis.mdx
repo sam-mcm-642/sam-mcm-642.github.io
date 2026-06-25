@@ -1,38 +1,74 @@
 ---
 title: Neurosymbolic Visual Grounding
-summary: Thesis research combining neural perception with symbolic reasoning for visual grounding.
-role: Researcher — problem formulation, model implementation, and evaluation.
+summary: A thesis system that grounds natural-language referring expressions to objects in an image by reasoning over generated scene graphs with differentiable logic.
+role: Researcher — problem formulation, full implementation, and evaluation.
 stack:
   - Python
   - PyTorch
-  - Neurosymbolic methods
-  - Computer vision
-  - NLP
-# video: optional
+  - DeepSoftLog
+  - Scene Graph Generation
+  - LLMs
+  - Visual Genome
+  - Weights & Biases
+# repo intentionally omitted — being cleaned up (brief §5)
 featured: true
 order: 2
-date: 2025-06-01
+date: 2025-08-01
 draft: false
 ---
 
-> **[TODO — confirm copy]** Replace the bracketed sections with the real details
-> of your thesis. Keep the framing on the research contribution and methods.
+My master's thesis tackles **referring expression comprehension** — given an
+image and a phrase like *"the man in the red shirt to the left of the dog"*,
+locate the exact object being referred to. Rather than learning this end to end
+as a black box, I built a **neurosymbolic** system that separates perception
+from reasoning: neural models read the image and the language, and a
+differentiable logic engine reasons over the result to make the grounding
+decision explicit and inspectable.
 
 ## Problem
 
-[TODO — the research question: what visual-grounding problem you tackled and why
-purely neural (or purely symbolic) approaches struggle with it.]
+Purely neural grounding models are accurate but opaque — they produce a box with
+no account of *why*, and they struggle with the compositional, relational
+structure of language ("left of", "holding", "the taller one"). Purely symbolic
+systems can reason over that structure but are brittle: they break the moment the
+words in the expression don't exactly match the labels a detector produced
+("guy" vs. "man", "bike" vs. "bicycle"). The research question was whether a
+**neurosymbolic** approach could keep the relational reasoning of logic while
+using neural representations to absorb that vocabulary and perceptual noise.
 
 ## Approach
 
-[TODO — the neurosymbolic method: how neural perception and symbolic reasoning
-are combined, the architecture, and the datasets / benchmarks used.]
+The system is a three-stage pipeline:
+
+1. **Perception → scene graph.** A scene-graph generation model (a Motif-based
+   architecture) turns the image into a structured graph of objects and their
+   relationships — subject–predicate–object triplets grounded to image regions.
+2. **Language → logical query.** The referring expression is parsed into a
+   structured symbolic query (a set of typed constraints over entities and
+   relations) using an LLM, so free-form text becomes something the reasoner can
+   operate on.
+3. **Reasoning → grounding.** A differentiable probabilistic-logic engine
+   (**DeepSoftLog**, extending my supervisor's library) reasons over the scene
+   graph to satisfy the query and ground it to the correct region. Its key
+   property is **soft unification**: symbols match by *embedding similarity*
+   rather than exact string equality, so "guy" can unify with a detected "man".
+   That's what bridges the gap between neural perception and symbolic reasoning —
+   and it yields a probabilistic proof, an interpretable trace of *why* a given
+   object was chosen.
 
 ## My contribution
 
-[TODO — specifically what you formulated, implemented, and evaluated.]
+I formulated the problem, implemented the full pipeline, and ran the evaluation —
+the scene-graph processing, the LLM query parser, and the integration with the
+soft-logic reasoner, including extending the library to fit the grounding task.
+Evaluation used IoU against ground-truth boxes plus accuracy and recall, with
+analysis of how performance varied with the relational complexity of the query.
 
-## Results
+## Outcome
 
-[TODO — findings and evaluation. Include benchmark comparisons only if you can
-cite them accurately.]
+A working neurosymbolic grounding system that produces not just a predicted
+region but an inspectable reasoning trace explaining it — demonstrating that
+soft unification can connect noisy neural perception to structured logical
+reasoning for visual grounding. The result is a research prototype rather than a
+production system; the work is the method and the analysis of where relational,
+interpretable reasoning helps.
