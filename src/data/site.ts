@@ -14,15 +14,15 @@ export interface SocialLink {
 }
 
 /*
-  Privacy-friendly, cookieless analytics (no consent banner needed).
-  Off by default. To enable: create a site at https://plausible.io (or self-host
-  / use a compatible script), then set `plausibleDomain` to your site domain.
+  Free, privacy-friendly, cookieless analytics via GoatCounter (no consent
+  banner needed). Off by default. To enable:
+    1. Create a free account at https://www.goatcounter.com/ and pick a site code.
+    2. Set `goatcounterCode` below to that code.
+  Your dashboard then lives at https://<code>.goatcounter.com.
   Leave it empty and no analytics script is loaded at all.
 */
 export const analytics = {
-  plausibleDomain: '', // e.g. 'sam-mcm-642.github.io'
-  // Override only if self-hosting Plausible or using a compatible endpoint.
-  plausibleSrc: 'https://plausible.io/js/script.js',
+  goatcounterCode: '', // e.g. 'sammcmanagan' -> dashboard at sammcmanagan.goatcounter.com
 };
 
 export const site = {

@@ -55,10 +55,15 @@ const personSchema = {
 
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} is:inline />
 
-    {/* Privacy-friendly analytics — only loads when a domain is configured (see src/data/site.ts). */}
+    {/* Privacy-friendly analytics (GoatCounter) — only loads when a code is set (see src/data/site.ts). */}
     {
-      analytics.plausibleDomain && (
-        <script defer data-domain={analytics.plausibleDomain} src={analytics.plausibleSrc} is:inline />
+      analytics.goatcounterCode && (
+        <script
+          data-goatcounter={`https://${analytics.goatcounterCode}.goatcounter.com/count`}
+          async
+          src="//gc.zgo.at/count.js"
+          is:inline
+        />
       )
     }
 

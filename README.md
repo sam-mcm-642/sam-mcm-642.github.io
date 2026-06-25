@@ -69,10 +69,13 @@ re-skins the whole site. Nothing references raw hex values directly.
 
 ### Enable analytics (optional)
 
-Privacy-friendly, cookieless analytics is wired up but **off by default** — no
-script loads until you opt in. To enable: create a site at
-[plausible.io](https://plausible.io) (or self-host a compatible script), then set
-`analytics.plausibleDomain` in `src/data/site.ts` to your site domain. No cookie
+Free, privacy-friendly, cookieless analytics ([GoatCounter](https://www.goatcounter.com/))
+is wired up but **off by default** — no script loads until you opt in. To enable:
+
+1. Create a free account at [goatcounter.com](https://www.goatcounter.com/) and choose a site code.
+2. Set `analytics.goatcounterCode` in `src/data/site.ts` to that code.
+
+Your traffic dashboard then lives at `https://<code>.goatcounter.com`. No cookie
 banner is needed.
 
 ## Deployment
