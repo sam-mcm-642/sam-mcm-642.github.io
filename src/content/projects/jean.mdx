@@ -1,52 +1,100 @@
 ---
 title: Jean
-summary: An ML-powered application built end to end — from the model stack to the product around it.
-role: Sole builder — ML modelling, backend, and full-stack engineering.
+summary: A friend-matching app powered by an LLM that interviews users, then a matching engine that forms compatible groups and recommends places to meet.
+role: Sole builder — ML pipeline, matching engine, backend, and React Native app.
 stack:
   - Python
-  - PyTorch
-  - LLMs / RAG
   - FastAPI
-  - React
-  - PostgreSQL
-# repo intentionally omitted — deferred until confirmed (brief §5)
+  - PyTorch / Transformers
+  - LLMs (Llama 3.1 70B)
+  - pgvector
+  - Postgres / Supabase
+  - Redis / ARQ
+  - Optuna
+  - React Native
+# repo intentionally omitted — private (brief §5)
 # video: 'https://youtu.be/REPLACE_WITH_UNLISTED_ID'   # uncomment to embed walkthrough
 featured: true
 order: 1
-date: 2025-12-01
+date: 2026-01-15
 draft: false
 ---
 
-> **[TODO — confirm copy]** This case study is framed around the *technical work*
-> only (ML stack, architecture, what I built), per the privacy constraints. Fill
-> the bracketed sections with specifics. Do **not** add launch/roadmap/timeline
-> framing.
+Jean is a friend-matching app I designed and built end to end. Instead of a
+profile form, an LLM chatbot *interviews* each user in natural conversation;
+a backend pipeline turns those conversations into a structured psychological
+profile; and a matching engine uses those profiles to form compatible friend
+groups and recommend venues and events for them to meet. I built the whole
+stack solo — the ML pipeline, the matching and recommendation engines, the
+FastAPI backend, and the React Native app.
 
 ## Problem
 
-[TODO — 2–3 sentences on the problem Jean solves, stated as an engineering
-challenge: what was hard about it technically and why a naive approach falls
-short.]
+Matching people for genuine compatibility is hard because the useful signal —
+personality, values, how someone actually spends their time — is exactly what a
+sign-up form fails to capture. People are bad at self-describing in dropdowns,
+and free-text bios are unstructured noise to an algorithm. The core engineering
+problem was: **turn open-ended conversation into structured, comparable signal,
+then match on it at scale.**
 
 ## What I built
 
-I designed and built Jean end to end — the machine learning core and the
-full-stack application around it.
+**Conversational profiling.** Jean (the chatbot) conducts an adaptive interview
+using a large language model. A processing pipeline extracts facts from each
+session — interests, lifestyle, and psychometric measures including Big Five
+personality traits and linguistic tone — with gap detection that drives what
+Jean asks next, so the interview targets whatever the profile is still missing.
 
-- **Modelling.** [TODO — the ML approach: models used, why; e.g. retrieval,
-  fine-tuning, embeddings, inference pipeline.]
-- **Architecture.** [TODO — how the system is structured: data flow, services,
-  storage, how inference is served.]
-- **Product surface.** [TODO — the interface users interact with and how it
-  connects to the model.]
+**A typed fact base.** Conversation is messy, so I designed a three-bucket
+storage model to keep it queryable: open-ended interests as a text
+entity-attribute store governed by a fact registry; numeric psychometric
+measures (with confidence and sample size) as a separate metric store; and a
+slim set of hard-filter columns for the few fixed attributes matching needs
+directly. Each user is projected into a precomputed vector the matching engine
+reads, rather than scoring raw rows at query time.
 
-## Approach & engineering decisions
+**Matching & group formation.** A candidate-generation step narrows the search
+space (including geospatial proximity via PostGIS), a scoring engine combines
+embedding similarity with a weighted rule system over profile and questionnaire
+signals, and a group-formation step assembles compatible *groups* rather than
+one-to-one pairs — then generates a human explanation of why a group fits.
 
-[TODO — the interesting decisions: trade-offs you made, what you optimised for
-(latency, cost, quality), and how the psychology background shaped the feature
-design.]
+**Recommendations.** An ingestion layer pulls venues and events from external
+APIs, embeds them with pgvector, and a serve-time recommender ranks them for
+each group through a re-ranking layer combining several behavioural signals.
+
+**Self-tuning scoring.** Every recommendation is logged as an outcome, feeding an
+A/B-testing and Bayesian-optimisation system (Optuna) that searches the scoring
+weights and compatibility-rule parameters to improve correlation with real
+engagement — so the matching quality improves from usage rather than guesswork.
+
+## Architecture & engineering decisions
+
+- **Service split.** The LLM chatbot runs as its own service, isolated from the
+  core API so the conversational layer and the matching backend scale and deploy
+  independently.
+- **Async job queue.** Heavy work — fact extraction, embedding refresh, matching
+  runs, ingestion, notifications — runs off the request path on a Redis/ARQ
+  worker with a cron schedule, keeping the API responsive.
+- **Provider-agnostic LLM layer.** The model is configurable behind a router
+  (Llama 3.1 70B by default), so the inference backend can change without
+  touching pipeline code.
+- **Config as data.** Every tunable — score weights, thresholds, intervals —
+  lives in one typed config module, overridable per environment, so behaviour
+  changes never require code edits.
+- **Migration-driven schema.** All database changes are versioned migration
+  files, applied additively with a gated cutover, so the schema can evolve under
+  a running system without breaking it.
+
+This is where the psychology background shows up directly: choosing *which*
+psychometric constructs to model, how to elicit them conversationally, and how
+to turn them into features the matching engine can actually use was as much a
+behavioural-science problem as an engineering one.
 
 ## Outcome
 
-[TODO — what the finished system does well, qualitatively. Keep to engineering
-outcomes; avoid metrics you can't substantiate.]
+A working end-to-end product: users hold a real conversation with Jean, get
+matched into compatible groups, and receive venue and event recommendations to
+meet up — all served by a system that tunes its own matching quality from
+feedback. The build spans roughly 20k lines of application code across the
+Python backend and React Native app, on a Postgres/pgvector data layer.
