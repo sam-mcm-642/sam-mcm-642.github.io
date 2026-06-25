@@ -1,0 +1,83 @@
+---
+title: ResearchDigest
+summary: A local-first system that tracks arXiv, scores new papers for relevance with an LLM, and surfaces only what's worth reading — with semantic search and a weekly email digest.
+role: Designer and sole builder — pipeline, backend, dashboard, and automation.
+stack:
+  - Python
+  - FastAPI
+  - PostgreSQL
+  - pgvector
+  - OpenAI
+  - MLflow
+  - SQLAlchemy
+  - Docker
+# repo intentionally omitted — deferred (brief §5)
+featured: true
+order: 3
+date: 2026-02-01
+draft: false
+---
+
+ResearchDigest is a personalised research-paper discovery system built around
+arXiv. You define your research interests; it fetches recent papers, uses an LLM
+to score each one's relevance and summarise the strong ones, and surfaces only
+what's worth your time — through a local dashboard and an automated weekly email.
+I designed and built the whole thing: the ingestion-and-scoring pipeline, the
+backend and database, the web dashboard, and the automation.
+
+## Problem
+
+Staying current with a fast-moving field means scanning far more arXiv listings
+than anyone has time for, where most papers are irrelevant to your specific
+interests. Keyword alerts are too blunt — they either flood you or miss things
+phrased differently. I wanted intelligent curation that understands relevance
+the way I'd judge it, running entirely on my own machine with no cloud
+infrastructure or recurring cost beyond cents of API usage.
+
+## What I built
+
+An eleven-step pipeline (`src/main.py`) that runs the full flow:
+
+- **Ingest.** An arXiv client pulls recent papers across configured categories,
+  with rate limiting.
+- **Filter.** A cheap keyword pass against the user's research interests narrows
+  the candidate set before any LLM spend.
+- **Score & summarise.** An LLM scores each paper's relevance on a 1–5 scale
+  against the interest profile (with tunable prompts); only papers scoring ≥4
+  get a generated summary, keeping cost down.
+- **Embed.** Papers are embedded and stored in pgvector, enabling semantic
+  search by conceptual similarity rather than exact keywords.
+- **Store & track.** Everything lands in PostgreSQL; each run is logged to MLflow
+  with parameters, metrics, and cost, and PDFs are filed locally by topic.
+
+On top of the data layer sits a **FastAPI + Jinja/Tailwind dashboard** for
+browsing and filtering papers, a reading queue, markdown notes, author
+following, and semantic search. A separate lightweight digest script emails the
+top papers of the week, scheduled via **macOS launchd** and delivered over Gmail
+SMTP — zero always-on services.
+
+## Architecture & engineering decisions
+
+- **Local-first by design.** PostgreSQL + pgvector in Docker, models called over
+  API, everything else on the laptop — no cloud infrastructure, predictable
+  near-zero cost, full data ownership.
+- **Service-oriented backend.** Cleanly separated services (arXiv client,
+  filtering, LLM scoring, vector search, storage, MLflow, metrics, PDF download)
+  behind a single pipeline orchestrator, each independently testable.
+- **Cost-aware LLM use.** The cheap keyword filter runs first and summaries are
+  gated behind the relevance threshold, so the expensive model only touches
+  papers that clear earlier stages — a few cents per run.
+- **Migration-managed schema.** SQLAlchemy models with Alembic migrations across
+  ten tables (papers, scores, summaries, embeddings, feedback, reading queue,
+  notes, followed authors, run tracking).
+- **Feedback-aware metrics.** A metrics service computes precision/recall/F1 from
+  the user's thumbs-up/down signals, so scoring quality is measurable over time.
+
+## Outcome
+
+A genuinely useful daily tool: it turns the firehose of arXiv into a short,
+ranked, summarised reading list tailored to my interests, searchable by meaning,
+with a hands-off weekly email — all running locally for the price of a coffee a
+month in API calls. It's the most full-stack project in this set, spanning data
+engineering, applied LLM work, an MLOps tracking layer, a web app, and
+OS-level automation.
