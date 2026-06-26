@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NetworkMotif from '../components/NetworkMotif.astro';
 import { site, socials } from '../data/site';
+import { Image } from 'astro:assets';
+import me from '../assets/me.jpg';
 
 /*
   Landing page — deliberately minimal (brief §5): the positioning story, a
@@ -64,13 +66,14 @@ import { site, socials } from '../data/site';
 
       <!-- Portrait slot -->
       <div class="reveal is-visible mx-auto w-full max-w-[260px]">
-        <div
-          class="relative aspect-square overflow-hidden rounded-2xl border border-border bg-accent-soft"
-        >
-          <NetworkMotif class="absolute inset-0 h-full w-full text-accent opacity-30" />
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="font-display text-5xl font-bold text-accent/60">SM</span>
-          </div>
+        <div class="relative aspect-square overflow-hidden rounded-2xl border border-border">
+          <Image
+            src={me}
+            alt={site.name}
+            width={520}
+            height={520}
+            class="h-full w-full object-cover"
+          />
         </div>
       </div>
     </div>
